@@ -1,7 +1,7 @@
 # bedesigner
 Design guides using a indexed reference genome
 
-## manual
+## Manual
 To run this script you need to compile [this project](https://github.com/dancooke/bioio) and copy the fasta binary into the root folder of this project. You might need to change the path to fasta.exe, if you are using Windows.
 
 To run the tool run this in an Pandas containing Python environment:
