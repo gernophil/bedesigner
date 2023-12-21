@@ -60,7 +60,7 @@ def main():
         #                                     position)
         # fasta_cmd =['./fasta', ref_genome, target_base_position]
         # target_base_ref = subprocess.Popen(fasta_cmd, stdout=subprocess.PIPE ).communicate()[0].strip().decode()
-        target_base_ref = ref_genome_pyfaidx[chrom][position]
+        target_base_ref = str(ref_genome_pyfaidx[chrom][position])
 
         if (target_base_ref == "A" and alt == "G") or (target_base_ref == "C" and alt == "T"):
             editable = True
@@ -72,7 +72,7 @@ def main():
 
             # fasta_cmd = ['./fasta', ref_genome, target_position]
             # target_seq_ref = subprocess.Popen(fasta_cmd, stdout=subprocess.PIPE ).communicate()[0].strip().decode()
-            target_seq_ref = ref_genome_pyfaidx[chrom][position-bases_before_variant:position+bases_after_variant_with_PAM+1] # + 1 since last position is excluded
+            target_seq_ref = str(ref_genome_pyfaidx[chrom][position-bases_before_variant:position+bases_after_variant_with_PAM+1]) # + 1 since last position is excluded
             target_seq = target_seq_ref
 
         elif (target_base_ref == "G" and alt == "A") or (target_base_ref == "T" and alt == "C"):
@@ -85,7 +85,7 @@ def main():
 
             # fasta_cmd = ['./fasta', ref_genome, target_position]
             # target_seq_ref = subprocess.Popen(fasta_cmd, stdout=subprocess.PIPE ).communicate()[0].strip().decode()
-            target_seq_ref = ref_genome_pyfaidx[chrom][position-bases_after_variant_with_PAM:position+bases_before_variant+1] # + 1 since last position is excluded
+            target_seq_ref = str(ref_genome_pyfaidx[chrom][position-bases_after_variant_with_PAM:position+bases_before_variant+1]) # + 1 since last position is excluded
             target_seq = target_seq_ref.replace('A', '*').replace('T', 'A').replace('*', 'T').replace('C', '&').replace('G', 'C').replace('&', 'G')[::-1]
 
         else:
