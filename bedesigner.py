@@ -1,7 +1,8 @@
 import sys
 import time
 import pandas as pd
-import subprocess
+# import subprocess
+import pyfaidx
 
 def main():
     time_stamp = time.time()
@@ -16,6 +17,7 @@ def main():
     print("Using this path to your reference genome: {}".format(ref_genome))
 
 
+    ref_genome_pyfaidx = pyfaidx.Fasta(ref_genome)
     variant_list = pd.read_csv(input_file, sep=',')["variant"]
 
     all_variant = []
@@ -54,33 +56,36 @@ def main():
         bases_before_variant = bases_before_ew + length_edit_window - 1 # - 1 since variant always need to stay in the edit window
         bases_after_variant_with_PAM = bases_after_ew_with_PAM + length_edit_window - 1 # - 1 since variant always need to stay in the edit window
 
-        target_base_position = "{}:{}".format(chrom,
-                                            position)
-        fasta_cmd =['./fasta', ref_genome, target_base_position]
-        target_base_ref = subprocess.Popen(fasta_cmd, stdout=subprocess.PIPE ).communicate()[0].strip().decode()
+        # target_base_position = "{}:{}".format(chrom,
+        #                                     position)
+        # fasta_cmd =['./fasta', ref_genome, target_base_position]
+        # target_base_ref = subprocess.Popen(fasta_cmd, stdout=subprocess.PIPE ).communicate()[0].strip().decode()
+        target_base_ref = ref_genome_pyfaidx[chrom][position]
 
         if (target_base_ref == "A" and alt == "G") or (target_base_ref == "C" and alt == "T"):
             editable = True
             rev_com = False
             target_base = target_base_ref
-            target_position = "{}:{}-{}".format(chrom,
-                                                position-bases_before_variant,
-                                                position+bases_after_variant_with_PAM+1) # + 1 since last position is excluded
+            # target_position = "{}:{}-{}".format(chrom,
+            #                                     position-bases_before_variant,
+            #                                     position+bases_after_variant_with_PAM+1) # + 1 since last position is excluded
 
-            fasta_cmd = ['./fasta', ref_genome, target_position]
-            target_seq_ref = subprocess.Popen(fasta_cmd, stdout=subprocess.PIPE ).communicate()[0].strip().decode()
+            # fasta_cmd = ['./fasta', ref_genome, target_position]
+            # target_seq_ref = subprocess.Popen(fasta_cmd, stdout=subprocess.PIPE ).communicate()[0].strip().decode()
+            target_seq_ref = ref_genome_pyfaidx[chrom][position-bases_before_variant:position+bases_after_variant_with_PAM+1] # + 1 since last position is excluded
             target_seq = target_seq_ref
 
         elif (target_base_ref == "G" and alt == "A") or (target_base_ref == "T" and alt == "C"):
             editable = True
             rev_com = True
             target_base = target_base_ref.replace('A', '*').replace('T', 'A').replace('*', 'T').replace('C', '&').replace('G', 'C').replace('&', 'G')[::-1]
-            target_position = "{}:{}-{}".format(chrom,
-                                                position-bases_after_variant_with_PAM,
-                                                position+bases_before_variant+1) # + 1 since last position is excluded
+            # target_position = "{}:{}-{}".format(chrom,
+            #                                     position-bases_after_variant_with_PAM,
+            #                                     position+bases_before_variant+1) # + 1 since last position is excluded
 
-            fasta_cmd = ['./fasta', ref_genome, target_position]
-            target_seq_ref = subprocess.Popen(fasta_cmd, stdout=subprocess.PIPE ).communicate()[0].strip().decode()
+            # fasta_cmd = ['./fasta', ref_genome, target_position]
+            # target_seq_ref = subprocess.Popen(fasta_cmd, stdout=subprocess.PIPE ).communicate()[0].strip().decode()
+            target_seq_ref = ref_genome_pyfaidx[chrom][position-bases_after_variant_with_PAM:position+bases_before_variant+1] # + 1 since last position is excluded
             target_seq = target_seq_ref.replace('A', '*').replace('T', 'A').replace('*', 'T').replace('C', '&').replace('G', 'C').replace('&', 'G')[::-1]
 
         else:
