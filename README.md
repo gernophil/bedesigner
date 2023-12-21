@@ -11,4 +11,4 @@ The input file needs to be a csv file with `","` as separator containing the col
 
 For example: chr1_123456_T
 
-The old version of this tool required a compiled version of [this project](https://github.com/dancooke/bioio). Since using `pyfaidx` that's not necessary anymore. Now, it should also work, if the genome is not indexed and with chromosome names that are not just numbers (without "chr"), but I haven't tested that yet.
+The old version of this tool required a compiled version of [this project](https://github.com/dancooke/bioio). Since using `pyfaidx` that's not necessary anymore. Now, it should also work, if the genome is not indexed and with chromosome names that are not just numbers (without "chr"), but I haven't tested that yet. For the last point (`chr1` or `1`) you need to disable line 37 of the script, since it currently simply removes and `chr` from the chromosome part, but I am working on an improvement.
