@@ -165,7 +165,8 @@ def main():
 
     sgrnas.to_csv(output_file + ".csv", sep=';', index=False)
 
-    sgrnas_filtered = sgrnas[sgrnas.astype(str)["all_possible_guides"] != "[]"]
+    sgrnas_filtered = sgrnas[(sgrnas.astype(str)["all_possible_guides"] != "[]") &
+                             (sgrnas.astype(str)["all_possible_guides"] != "")]
 
     sgrnas_filtered.to_csv(output_file + "_filtered.csv", sep=';', index=False)
 
