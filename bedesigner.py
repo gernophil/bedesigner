@@ -13,20 +13,20 @@ def main():
     required = parser.add_argument_group("required arguments")
     required.add_argument('-i', '--input', help='Path to the input file',
                           metavar='<PATH>', required=True)
-    required.add_argument('-g', '--refgenome', help='Path to the reference genome',
+    required.add_argument('-g', '--ref-genome', help='Path to the reference genome',
                           metavar='<PATH>', required=True)
     required.add_argument('-o', '--output', help='Path to the output file',
                           metavar='<PATH>', required=True)
 
     parser.add_argument('-p', '--pam-site', help='Sequence of the PAM site',
                         choices=['NGG', 'NG'], default='NGG', type=str)
-    parser.add_argument('-s', '--window-start', help='Startposition of editing window',
+    parser.add_argument('-s', '--window-start', help='Starting position of editing window',
                         default=4, type=int)
-    parser.add_argument('-e', '--window-end', help='Endposition of editing window',
+    parser.add_argument('-e', '--window-end', help='End position of editing window',
                         default=8, type=int)
-    parser.add_argument('-l', '--guide-length', help='Endposition of editing window',
+    parser.add_argument('-l', '--guide-length', help='Length of guide',
                         default=20, type=int)
-    parser.add_argument('-n', '--ignore-string', help='String to be ignored in the variant string',
+    parser.add_argument('-n', '--ignore-string', help='Substring to be ignored in the variant string',
                         type=str)
     parser.add_argument('-b', '--base-editor', help='Base editor to design guides for',
                         choices=['both', 'ABE', 'CBE'], default='both', type=str)
@@ -42,22 +42,22 @@ def main():
     if not os.path.isfile(args.input):
         sys.exit('Input file not found!')
 
-    if not os.path.isfile(args.refgenome):
+    if not os.path.isfile(args.ref_genome):
         sys.exit('Reference genome not found!')
 
 
     time_stamp = time.time()
     script_name = sys.argv[0]
-    ref_genome = args.refgenome
+    refgenome = args.ref_genome
     input_file = args.input
     pamsite = args.pam_site
     edit_window_start = args.window_start
     edit_window_end = args.window_end
-    guide_length = args.guide_length
+    guidelength = args.guide_length
     ignorestring = args.ignore_string
     output_file = args.output + "_p" + pamsite + "_e" + \
                   str(edit_window_start) + "-" + str(edit_window_end) + \
-                  "_l" + str(guide_length) # + "_" + str(time_stamp)
+                  "_l" + str(guidelength) # + "_" + str(time_stamp)
 
     baseeditor = args.base_editor
     if baseeditor == "both":
@@ -73,10 +73,10 @@ def main():
     print("Getting guides for base editing using {}".format(script_name))
     print("for the variants from file {}".format(input_file))
     print("and writing to files {}.csv and {}_filtered.csv.".format(output_file, output_file))
-    print("Using this path to your reference genome: {}".format(ref_genome))
+    print("Using this path to your reference genome: {}".format(refgenome))
 
 
-    ref_genome_pyfaidx = pyfaidx.Fasta(ref_genome)
+    ref_genome_pyfaidx = pyfaidx.Fasta(refgenome)
     variant_list = pd.read_csv(input_file, sep=',')["variant"]
 
     all_variant = []
@@ -100,7 +100,7 @@ def main():
             chrom = chrom.replace(ignorestring, "")
         position = int(position) - 1
 
-        length = guide_length
+        length = guidelength
 
         position_edit_window_start = edit_window_start
         position_edit_window_end = edit_window_end
