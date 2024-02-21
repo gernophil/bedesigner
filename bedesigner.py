@@ -247,20 +247,20 @@ def main():
             all_possible_pams.append("")
             all_rev_com.append("{}".format(""))
 
-    sgrnas = pd.DataFrame({"all_variant": all_variant,
-                          "all_editable": all_editable,
-                          "all_be_strings": all_be_strings,
-                          "all_original_alt": all_original_alt,
-                          "all_target_seq_ref": all_target_seq_ref,
-                          "all_target_seq": all_target_seq,
-                          "all_target_base_ref": all_target_base_ref,
-                          "all_target_base": all_target_base,
-                          "all_possible_guides_with_pam": all_possible_guides_with_pam,
-                          "all_edit_strings": all_edit_strings,
-                          "all_edit_pos_strings": all_edit_pos_strings,
-                          "all_possible_guides": all_possible_guides,
-                          "all_possible_pams": all_possible_pams,
-                          "all_rev_com": all_rev_com})
+    sgrnas = pd.DataFrame({"variant": all_variant,
+                           "editable": all_editable,
+                           "base_editor": all_be_strings,
+                           "originally_intended_ALT": all_original_alt,
+                           "target_seq_reference_genome": all_target_seq_ref,
+                           "targeted_seq_by_guide": all_target_seq,
+                           "target_base_reference_genome": all_target_base_ref,
+                           "targeted_base_by_guide": all_target_base,
+                           "all_possible_guides_with_pam": all_possible_guides_with_pam,
+                           "all_off-target_bases_by_guide": all_edit_strings,
+                           "all_edited_positions_by_guide": all_edit_pos_strings,
+                           "all_possible_guides": all_possible_guides,
+                           "all_possible_pams": all_possible_pams,
+                           "guide_target_opposite_strand": all_rev_com})
 
     sgrnas.to_csv(output_file + ".csv", sep=';', index=False)
 
