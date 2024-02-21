@@ -1,74 +1,14 @@
-import os
 import sys
-import argparse
 import time
 import pandas as pd
 import pyfaidx
 
 def main():
-
-    parser = argparse.ArgumentParser(description='bedesigner',
-                                     prog='python bedesigner.py')
-
-    required = parser.add_argument_group("required arguments")
-    required.add_argument('-i', '--input', help='Path to the input file',
-                          metavar='<PATH>', required=True)
-    required.add_argument('-g', '--refgenome', help='Path to the reference genome',
-                          metavar='<PATH>', required=True)
-    required.add_argument('-o', '--output', help='Path to the output file',
-                          metavar='<PATH>', required=True)
-
-    parser.add_argument('-p', '--pam-site', help='Sequence of the PAM site',
-                        choices=['NGG', 'NG'], default='NGG', type=str)
-    parser.add_argument('-s', '--window-start', help='Startposition of editing window',
-                        default=4, type=int)
-    parser.add_argument('-e', '--window-end', help='Endposition of editing window',
-                        default=8, type=int)
-    parser.add_argument('-l', '--guide-length', help='Endposition of editing window',
-                        default=20, type=int)
-    parser.add_argument('-n', '--ignore-string', help='String to be ignored in the variant string',
-                        type=str)
-    parser.add_argument('-b', '--base-editor', help='Base editor to design guides for',
-                        choices=['both', 'ABE', 'CBE'], default='both', type=str)
-    parser.add_argument('-a', '--all-possible', help='Design for all ALTs',
-                        action='store_true')
-
-    if len(sys.argv) == 1:
-        parser.print_help()
-        sys.exit()
-
-    args = parser.parse_args()
-
-    if not os.path.isfile(args.input):
-        sys.exit('Input file not found!')
-
-    if not os.path.isfile(args.refgenome):
-        sys.exit('Reference genome not found!')
-
-
     time_stamp = time.time()
     script_name = sys.argv[0]
-    ref_genome = args.refgenome
-    input_file = args.input
-    pamsite = args.pam_site
-    edit_window_start = args.window_start
-    edit_window_end = args.window_end
-    guide_length = args.guide_length
-    ignorestring = args.ignore_string
-    output_file = args.output + "_p" + pamsite + "_e" + \
-                  str(edit_window_start) + "-" + str(edit_window_end) + \
-                  "_l" + str(guide_length) # + "_" + str(time_stamp)
-
-    baseeditor = args.base_editor
-    if baseeditor == "both":
-        ABE = True
-        CBE = True
-    elif baseeditor == "ABE":
-        ABE = True
-        CBE = False
-    elif baseeditor == "CBE":
-        ABE = False
-        CBE = True
+    ref_genome = sys.argv[1]
+    input_file = sys.argv[2]
+    output_file = sys.argv[3] + "_" + str(time_stamp)
 
     print("Getting guides for base editing using {}".format(script_name))
     print("for the variants from file {}".format(input_file))
@@ -81,8 +21,6 @@ def main():
 
     all_variant = []
     all_editable = []
-    all_be_strings = []
-    all_original_alt = []
     all_target_seq_ref = []
     all_target_seq = []
     all_target_base_ref = []
@@ -96,19 +34,18 @@ def main():
 
     for variant in variant_list:
         chrom, position, alt = variant.split("_")
-        if ignorestring:
-            chrom = chrom.replace(ignorestring, "")
+        chrom = chrom.replace("chr", "")
         position = int(position) - 1
 
-        length = guide_length
+        length = 20
 
-        position_edit_window_start = edit_window_start
-        position_edit_window_end = edit_window_end
+        position_edit_window_start = 4
+        position_edit_window_end = 8
 
-        PAM = pamsite
+        PAM = "NGG" # or "NG"
         PAM_length = len(PAM) # 2 or 3
 
-        total_length = length + PAM_length
+        total_length = length + PAM_length # 22 or 23
         length_edit_window = position_edit_window_end - (position_edit_window_start - 1)
 
         bases_before_ew = position_edit_window_start - 1
@@ -120,47 +57,17 @@ def main():
 
         target_base_ref = str(ref_genome_pyfaidx[chrom][position])
 
-        if (ABE and target_base_ref == "A" and alt == "G") or \
-           (ABE and target_base_ref == "A" and args.all_possible) or \
-           (CBE and target_base_ref == "C" and alt == "T") or \
-           (CBE and target_base_ref == "C" and args.all_possible):
+        if (target_base_ref == "A" and alt == "G") or (target_base_ref == "C" and alt == "T"):
             editable = True
             rev_com = False
-            if target_base_ref == "A":
-                be_string = "ABE"
-                if alt == "G":
-                    original_alt = True
-                else:
-                    original_alt = False
-            elif target_base_ref == "C":
-                be_string = "CBE"
-                if alt == "T":
-                    original_alt = True
-                else:
-                    original_alt = False
             target_base = target_base_ref
 
             target_seq_ref = str(ref_genome_pyfaidx[chrom][position-bases_before_variant:position+bases_after_variant_with_PAM+1]) # + 1 since last position is excluded
             target_seq = target_seq_ref
 
-        elif (ABE and target_base_ref == "T" and alt == "C") or \
-             (ABE and target_base_ref == "T" and args.all_possible) or \
-             (CBE and target_base_ref == "G" and alt == "A") or \
-             (CBE and target_base_ref == "G" and args.all_possible):
+        elif (target_base_ref == "G" and alt == "A") or (target_base_ref == "T" and alt == "C"):
             editable = True
             rev_com = True
-            if target_base_ref == "T":
-                be_string = "ABE"
-                if alt == "C":
-                    original_alt = True
-                else:
-                    original_alt = False
-            elif target_base_ref == "G":
-                be_string = "CBE"
-                if alt == "A":
-                    original_alt = True
-                else:
-                    original_alt = False
             target_base = target_base_ref.replace('A', '*').replace('T', 'A').replace('*', 'T').replace('C', '&').replace('G', 'C').replace('&', 'G')[::-1]
 
             target_seq_ref = str(ref_genome_pyfaidx[chrom][position-bases_after_variant_with_PAM:position+bases_before_variant+1]) # + 1 since last position is excluded
@@ -218,8 +125,6 @@ def main():
 
             all_variant.append(variant)
             all_editable.append(editable)
-            all_be_strings.append(be_string)
-            all_original_alt.append(original_alt)
             all_target_seq_ref.append(target_seq_ref)
             all_target_seq.append(target_seq)
             all_target_base_ref.append(target_base_ref)
@@ -234,8 +139,6 @@ def main():
         else:
             all_variant.append(variant)
             all_editable.append(editable)
-            all_be_strings.append("")
-            all_original_alt.append("")
             all_target_seq_ref.append("")
             all_target_seq.append("")
             all_target_base_ref.append("")
@@ -248,19 +151,17 @@ def main():
             all_rev_com.append("{}".format(""))
 
     sgrnas = pd.DataFrame({"all_variant": all_variant,
-                          "all_editable": all_editable,
-                          "all_be_strings": all_be_strings,
-                          "all_original_alt": all_original_alt,
-                          "all_target_seq_ref": all_target_seq_ref,
-                          "all_target_seq": all_target_seq,
-                          "all_target_base_ref": all_target_base_ref,
-                          "all_target_base": all_target_base,
-                          "all_possible_guides_with_pam": all_possible_guides_with_pam,
-                          "all_edit_strings": all_edit_strings,
-                          "all_edit_pos_strings": all_edit_pos_strings,
-                          "all_possible_guides": all_possible_guides,
-                          "all_possible_pams": all_possible_pams,
-                          "all_rev_com": all_rev_com})
+                        "all_editable": all_editable,
+                        "all_target_seq_ref": all_target_seq_ref,
+                        "all_target_seq": all_target_seq,
+                        "all_target_base_ref": all_target_base_ref,
+                        "all_target_base": all_target_base,
+                        "all_possible_guides_with_pam": all_possible_guides_with_pam,
+                        "all_edit_strings": all_edit_strings,
+                        "all_edit_pos_strings": all_edit_pos_strings,
+                        "all_possible_guides": all_possible_guides,
+                        "all_possible_pams": all_possible_pams,
+                        "all_rev_com": all_rev_com})
 
     sgrnas.to_csv(output_file + ".csv", sep=';', index=False)
 
