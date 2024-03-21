@@ -48,5 +48,5 @@ required arguments:
 
 Use the Rscript `bedesigner_long.R` to generate files with one line per guide (one file with all information and one file with only guide name and quide sequence). This needs the `tidyverse` package:
 ```
-Rscript --vanilla path/to/bedesigner_output_filtered.csv" path/to/bedesigner_long_complete.tsv path/to/bedesigner_long_names_and_sequence_only.tsv
+Rscript --vanilla path/to/bedesigner_output_filtered.csv path/to/bedesigner_long_complete.tsv path/to/bedesigner_long_names_and_sequence_only.tsv
 ```
