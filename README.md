@@ -5,7 +5,7 @@ Design guides using a reference genome
 You need to run this script in a Python environment containing `pandas` and `pyfaidx`.
 ```
 conda env create -f environment.yaml # will create a conda env with pandas and pyfaidx called bedesigner
-pip install -r requirements.txt # will isntall pandas and pyfaidx using PyPI (highly recommended to do this in a virtual environment)
+pip install -r requirements.txt # will install pandas and pyfaidx using PyPI (highly recommended to do this in a virtual environment)
 ```
 
 To run the tool run this in an Pandas and pyfaidx containing Python environment:
