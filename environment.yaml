@@ -1,0 +1,8 @@
+name: bedesigner
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - pandas
+  - pyfaidx
