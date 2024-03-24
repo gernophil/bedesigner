@@ -95,7 +95,13 @@ def main():
     all_rev_com = []
 
     for variant in variant_list:
-        chrom, position, alt = variant.split("_")
+        variant_coords = variant.split("_")
+        if len(variant_coords) == 3:
+            chrom, position, alt = variant_coords
+        elif len(variant_coords) == 4:
+            chrom, position, ref, alt = variant_coords
+        else:
+            raise ValueError("Your variants are improperly formatted. Please use [CHROM]_[POS]_[ALT] or [CHROM]_[POS]_[REF]_[ALT].")
         if ignorestring:
             chrom = chrom.replace(ignorestring, "")
         position = int(position) - 1
