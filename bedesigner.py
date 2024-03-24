@@ -98,8 +98,11 @@ def main():
         variant_coords = variant.split("_")
         if len(variant_coords) == 3:
             chrom, position, alt = variant_coords
+            alt = alt.upper()
         elif len(variant_coords) == 4:
             chrom, position, ref, alt = variant_coords
+            alt = alt.upper()
+            ref = ref.upper()
         else:
             raise ValueError("Your variants are improperly formatted. Please use [CHROM]_[POS]_[ALT] or [CHROM]_[POS]_[REF]_[ALT].")
         if ignorestring:
