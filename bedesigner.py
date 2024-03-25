@@ -84,6 +84,7 @@ def main():
     all_be_strings = []
     all_original_alt = []
     all_target_seq_ref = []
+    all_target_seq_ref_match = []
     all_target_seq = []
     all_target_base_ref = []
     all_target_base = []
@@ -128,6 +129,13 @@ def main():
         bases_after_variant_with_PAM = bases_after_ew_with_PAM + length_edit_window - 1 # - 1 since variant always need to stay in the edit window
 
         target_base_ref = str(ref_genome_pyfaidx[chrom][position])
+        if ref:
+            if ref == target_base_ref:
+                target_seq_ref_match = "ref_match"
+            else:
+                target_seq_ref_match = "REF_MISMATCH"
+        else:
+            target_seq_ref_match = "no_ref_input"
 
         if (ABE and target_base_ref == "A" and alt == "G") or \
            (ABE and target_base_ref == "A" and args.all_possible) or \
@@ -230,6 +238,7 @@ def main():
             all_be_strings.append(be_string)
             all_original_alt.append(original_alt)
             all_target_seq_ref.append(target_seq_ref)
+            all_target_seq_ref_match.append(target_seq_ref_match)
             all_target_seq.append(target_seq)
             all_target_base_ref.append(target_base_ref)
             all_target_base.append(target_base)
@@ -246,6 +255,7 @@ def main():
             all_be_strings.append("")
             all_original_alt.append("")
             all_target_seq_ref.append("")
+            all_target_seq_ref_match.append(target_seq_ref_match)
             all_target_seq.append("")
             all_target_base_ref.append("")
             all_target_base.append("")
@@ -261,6 +271,7 @@ def main():
                            "base_editor": all_be_strings,
                            "originally_intended_ALT": all_original_alt,
                            "target_seq_reference_genome": all_target_seq_ref,
+                           "ref_match": all_target_seq_ref_match,
                            "targeted_seq_by_guide": all_target_seq,
                            "target_base_reference_genome": all_target_base_ref,
                            "targeted_base_by_guide": all_target_base,
