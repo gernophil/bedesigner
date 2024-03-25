@@ -100,6 +100,7 @@ def main():
         if len(variant_coords) == 3:
             chrom, position, alt = variant_coords
             alt = alt.upper()
+            ref = ""
         elif len(variant_coords) == 4:
             chrom, position, ref, alt = variant_coords
             alt = alt.upper()
